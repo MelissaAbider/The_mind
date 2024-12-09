@@ -1,0 +1,75 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lachaise Assignment
+% LaTeX Template
+% Version 1.0 (26/6/2018)
+%
+% This template originates from:
+% http://www.LaTeXTemplates.com
+%
+% Authors:
+% Marion Lachaise & François Févotte
+% Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	ASSIGNMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Système et réseaux : pré-rapport} % Title of the assignment
+\author{Valentin VERSTRACTE \& Evan PETIT}
+
+\date{L3 --- \today} % University, school and/or department name(s) and a date
+
+
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Print the title
+
+
+%----------------------------------------------------------------------------------------
+%	Introduction
+%----------------------------------------------------------------------------------------
+
+\section{Structure générale de l'application}
+La structure générale de l'application est découpé en 3 programmes shell. GestionJeu, JoueurHumain, JoueurRobot. JoueurHumain lancera aux besoins un subshell pour résoudre des problèmes de pipes et entrées utilisateur bloquantes
+
+\section{La communication}
+La communication entre les différents shell s'effectue à travers de pipe pour transmettre des messages donnés. On utilisera des fichiers avec l'extension tmp pour synchroniser des données aux besoins. 
+
+\subsection{Les pipes}
+Les processus utilisent les pipes pour constamment lire ou envoyer des messages. La mise en place "d'une api" facilitera cette communication. Un message est constitué de la forme suivante :
+
+\begin{itemize}
+\item La première lettre est un chiffre qui décrit une action  
+\item La deuxième lettre est un point virgule
+\item Le reste est un message pouvant être afficher dans la console 
+\end{itemize}
+
+Exemple : gestionJeu envoie à tous les joueurs "3;Félications, le tour n°'\$ROUND' est terminé, on passe au tour suivant". Ainsi 3 décrit que le tour est terminé et envoie un message avec le numéro du tour que l'on peut afficher. 
+
+\subsection{Les fichiers tmp}
+On utilise les fichiers tmp pour stocker les valeurs de certaines variables et ainsi résoudre un problème de synchronisation. En effet, lire une pipe et lire une entrée utilisateur sont deux actions bloquantes ( qui bloquent l'exécution du code ). On se retrouve donc bloquer pour JoueurHumain qui doit lire des entrées utilisateur et recevoir des données / messages via la pipe. Pour résoudre ce détail JoueurHumain va lancer l'écoute des pipes dans un subshell et l'entrée utilisateur dans le shell parent. Le problème est le suivant : les pipes et la lecture utilisateur utilisent des variables en commun avec celle des entrées utilisateur mais elles ne seront pas synchronisées malgré le même nom ( différence entre le shell parent et le subshell ). Ainsi on enregistre / modifie au besoin les valeurs des variables dans des fichiers tmp pour chaque joueur.   
+
+\section{La gestion du temps}
+
+La gestion du temps n'est pas réellement existante, chaque processus réagit aux pipes et ( pour le joueurHumain ) à l'entrée clavier. On effectue des actions en conséquences. 
+
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
